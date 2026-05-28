@@ -7,8 +7,4 @@ openpyxl
 matplotlib
 folium
 streamlit-folium
-geopandas==0.14.4
-shapely
-fiona
-pyproj
-rtree
+requests
