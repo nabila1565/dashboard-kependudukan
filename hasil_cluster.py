@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import folium
-import geopandas as gpd
+#import geopandas as gpd
+import requests
 from pathlib import Path
 from streamlit_folium import st_folium
 import streamlit.components.v1 as components
@@ -153,11 +154,10 @@ def show_page():
 
     st.dataframe(df_cluster.head(38), use_container_width=True)
 
-    
     # =========================
     # PETA CLUSTER
     # =========================
-
+    
     st.markdown("""
     <div style="
         margin-top: 32px;
@@ -181,7 +181,8 @@ def show_page():
         </div>
     </div>
     """, unsafe_allow_html=True)
-
+    
+    
     # Fungsi untuk menyamakan nama daerah antara CSV dan GeoJSON
     def nama_daerah(nama):
         nama = str(nama).lower()
@@ -191,51 +192,74 @@ def show_page():
         nama = nama.replace(".", " ")
         nama = " ".join(nama.split())
         return nama
-
+    
+    
     # Ambil kolom yang dibutuhkan untuk peta
     df_peta = df_cluster[["Kabupaten/Kota", "Cluster"]].copy()
     df_peta["nama_bersih"] = df_peta["Kabupaten/Kota"].apply(nama_daerah)
-
-    # Ambil GeoJSON kabupaten/kota Indonesia
+    df_peta["Cluster"] = pd.to_numeric(df_peta["Cluster"], errors="coerce")
+    
+    
+    # Ambil GeoJSON kabupaten/kota Indonesia tanpa geopandas
     url_geojson = "https://raw.githubusercontent.com/AlfianAliM/Indonesia-GeoJSON/master/kab_kota.geojson"
-    gdf_indonesia = gpd.read_file(url_geojson)
-
-    # Filter hanya Provinsi Jawa Timur
-    # Kode provinsi Jawa Timur = 35
-    gdf_jatim = gdf_indonesia[
-        gdf_indonesia["code"].astype(str).str.startswith("35")
-    ].copy()
-
-    gdf_jatim["nama_bersih"] = gdf_jatim["name"].apply(nama_daerah)
-
-    # Gabungkan data GeoJSON dengan hasil cluster
-    gdf_cluster = gdf_jatim.merge(
-        df_peta,
-        on="nama_bersih",
-        how="left"
-    )
-
-    gdf_cluster["Cluster"] = pd.to_numeric(gdf_cluster["Cluster"], errors="coerce")
-    gdf_cluster_plot = gdf_cluster.dropna(subset=["Cluster"]).copy()
-    gdf_cluster_plot["Cluster"] = gdf_cluster_plot["Cluster"].astype(int)
-
-    # Warna cluster
-    colors = {
-        0: "#2563EB",  # Biru
-        1: "#EF4444",  # Merah
-        2: "#10B981"   # Hijau
+    
+    response = requests.get(url_geojson)
+    response.raise_for_status()
+    geojson_data = response.json()
+    
+    
+    # Filter hanya Jawa Timur: kode provinsi Jawa Timur diawali 35
+    features_jatim = []
+    
+    for feature in geojson_data["features"]:
+        props = feature["properties"]
+    
+        code = str(props.get("code", ""))
+        nama_geo = props.get("name", "")
+    
+        if code.startswith("35"):
+            nama_bersih_geo = nama_daerah(nama_geo)
+    
+            match = df_peta[df_peta["nama_bersih"] == nama_bersih_geo]
+    
+            if not match.empty:
+                cluster_value = match.iloc[0]["Cluster"]
+    
+                if pd.notna(cluster_value):
+                    props["Cluster"] = int(cluster_value)
+                else:
+                    props["Cluster"] = None
+            else:
+                props["Cluster"] = None
+    
+            features_jatim.append(feature)
+    
+    
+    geojson_jatim_cluster = {
+        "type": "FeatureCollection",
+        "features": features_jatim
     }
-
+    
+    
+    # Warna cluster sesuai palette kamu
+    colors = {
+        0: "#132A13",
+        1: "#4F772D",
+        2: "#90A955"
+    }
+    
+    
     # Membuat peta
     m = folium.Map(
         location=[-7.55, 112.55],
         zoom_start=8,
         tiles="cartodbpositron"
     )
-
+    
+    
     def style_function(feature):
-        cluster = feature["properties"]["Cluster"]
-
+        cluster = feature["properties"].get("Cluster")
+    
         if cluster is None:
             return {
                 "fillColor": "#D1D5DB",
@@ -243,18 +267,19 @@ def show_page():
                 "weight": 0.8,
                 "fillOpacity": 0.5,
             }
-
+    
         cluster = int(cluster)
-
+    
         return {
             "fillColor": colors.get(cluster, "#9CA3AF"),
             "color": "black",
             "weight": 0.8,
             "fillOpacity": 0.8,
         }
-
+    
+    
     folium.GeoJson(
-        gdf_cluster_plot,
+        geojson_jatim_cluster,
         style_function=style_function,
         tooltip=folium.GeoJsonTooltip(
             fields=["name", "Cluster"],
@@ -262,10 +287,18 @@ def show_page():
             localize=True
         )
     ).add_to(m)
-
+    
+    
     # Tampilkan peta
     st_folium(m, width=1000, height=520)
 
+
+
+
+
+
+    
+   
    
     # =========================
     # INTERPRETASI SETIAP CLUSTER
