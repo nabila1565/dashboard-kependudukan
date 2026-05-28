@@ -243,9 +243,9 @@ def show_page():
     
     # Warna cluster sesuai palette kamu
     colors = {
-        0: "#132A13",
-        1: "#4F772D",
-        2: "#90A955"
+        0: "#84994F",
+        1: "#B45253",
+        2: "#FFE797"
     }
     
     
