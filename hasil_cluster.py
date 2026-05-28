@@ -421,7 +421,7 @@ def show_page():
             Serta, Laju Pertumbuhan Penduduk dan TPT yang tergolong rendah dibandingkan cluster lainnya.
             </div>
         </div>
-        """, height=500, scrolling=False)
+        """, height=600, scrolling=False)
     
 
     
