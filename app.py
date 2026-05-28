@@ -36,7 +36,7 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:hover {
-    background-color: rgba(77,166,255,0.35) !important;
+    background-color: none !important;
     transform: translateX(4px);
 }
 
