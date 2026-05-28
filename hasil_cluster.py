@@ -292,13 +292,6 @@ def show_page():
     # Tampilkan peta
     st_folium(m, width=1000, height=520)
 
-
-
-
-
-
-    
-   
    
     # =========================
     # INTERPRETASI SETIAP CLUSTER
@@ -333,7 +326,7 @@ def show_page():
             border: 1px solid #BFDBFE;
             border-radius: 22px;
             padding: 22px;
-            min-height: 470px;
+            min-height: auto;
             box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
             font-family: Arial, sans-serif;
             box-sizing: border-box;
@@ -438,7 +431,7 @@ def show_page():
             border: 1px solid #BFDBFE;
             border-radius: 22px;
             padding: 22px;
-            min-height: 470px;
+            min-height: auto;;
             box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
             font-family: Arial, sans-serif;
             box-sizing: border-box;
@@ -536,7 +529,7 @@ def show_page():
             border: 1px solid #BFDBFE;
             border-radius: 22px;
             padding: 22px;
-            min-height: 470px;
+            min-height: auto;
             box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
             font-family: Arial, sans-serif;
             box-sizing: border-box;
