@@ -521,7 +521,7 @@ def show_page():
             Serta, Laju Pertumbuhan Penduduk dan TPAK yang tergolong rendah dibandingkan cluster lainnya.
             </div>
         </div>
-        """, height=700, scrolling=False)
+        """, height=550, scrolling=False)
     
     components.html("""
         <div style="
