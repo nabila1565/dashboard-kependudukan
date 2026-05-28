@@ -241,11 +241,11 @@ def show_page():
     }
     
     
-    # Warna cluster sesuai palette kamu
+   # Warna cluster
     colors = {
-        0: "#84994F",
-        1: "#B45253",
-        2: "#FFE797"
+    0: "#2563EB",  # Biru
+    1: "#EF4444",  # Merah
+    2: "#10B981"   # Hijau
     }
     
     
