@@ -17,7 +17,7 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] {
-    background: #111844;
+    background: #556B2F;
 }
 
 [data-testid="stSidebar"] label {
